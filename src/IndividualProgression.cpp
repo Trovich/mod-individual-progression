@@ -353,6 +353,57 @@ bool IndividualProgression::hasCustomProgressionValue(uint32 creatureEntry)
     return (customProgressionMap.find(creatureEntry) != customProgressionMap.end());
 }
 
+void IndividualProgression::LoadCustomQuestProgressionEntries(std::string const& customQuestProgressionString)
+{
+    std::string delimitedValue;
+    std::stringstream customQuestProgressionStream;
+
+    customQuestProgressionStream.str(customQuestProgressionString);
+    while (std::getline(customQuestProgressionStream, delimitedValue, ','))
+    {
+        std::string pairOne, pairTwo;
+        std::stringstream progressionPairStream(delimitedValue);
+        progressionPairStream >> pairOne >> pairTwo;
+        uint32 questId = atoi(pairOne.c_str());
+        uint8 progressionValue = atoi(pairTwo.c_str());
+        if (questId)
+            sIndividualProgression->customQuestProgressionMap[questId] = progressionValue;
+    }
+}
+
+bool IndividualProgression::hasCustomQuestProgressionValue(uint32 questId)
+{
+    if (!questId)
+        return false;
+
+    if (customQuestProgressionMap.empty())
+        return false;
+
+    return (customQuestProgressionMap.find(questId) != customQuestProgressionMap.end());
+}
+
+// Advances the player's progression when a mapped quest (IndividualProgression.CustomQuestProgression) is turned in
+void IndividualProgression::checkQuestProgression(Player* player, uint32 questId)
+{
+    if (!enabled)
+        return;
+
+    if (!player || !player->IsInWorld() || !questId)
+        return;
+
+    auto questProgression = customQuestProgressionMap.find(questId);
+    if (questProgression == customQuestProgressionMap.end())
+        return;
+
+    ProgressionState newState = static_cast<ProgressionState>(questProgression->second);
+
+    if (!progressionLimit || (progressionLimit >= newState))
+        UpdateProgressionState(player, newState);
+
+    // Refresh world phasing right away so the player does not have to change zones to see the new phase
+    checkIPPhasing(player, player->GetAreaId());
+}
+
 bool IndividualProgression::isAttuned(Player* player)
 {
     if (!player || !player->IsInWorld())
@@ -1033,6 +1084,7 @@ private:
     static void LoadConfig()
     {
         sIndividualProgression->customProgressionMap.clear();
+        sIndividualProgression->customQuestProgressionMap.clear();
         sIndividualProgression->enabled = sConfigMgr->GetOption<bool>("IndividualProgression.Enable", true);
         sIndividualProgression->vanillaPowerAdjustment = sConfigMgr->GetOption<float>("IndividualProgression.VanillaPowerAdjustment", 1);
         sIndividualProgression->vanillaHealingAdjustment = sConfigMgr->GetOption<float>("IndividualProgression.VanillaHealingAdjustment", 1);
@@ -1059,6 +1111,7 @@ private:
         sIndividualProgression->RequiredZulGurubProgression = sConfigMgr->GetOption<uint8>("IndividualProgression.RequiredZulGurubProgression", 3);
         sIndividualProgression->RequiredZulAmanProgression = sConfigMgr->GetOption<uint8>("IndividualProgression.RequiredZulAmanProgression", 12);
         sIndividualProgression->LoadCustomProgressionEntries(sConfigMgr->GetOption<std::string>("IndividualProgression.CustomProgression", ""));
+        sIndividualProgression->LoadCustomQuestProgressionEntries(sConfigMgr->GetOption<std::string>("IndividualProgression.CustomQuestProgression", ""));
         sIndividualProgression->earlyDungeonSet2 = sConfigMgr->GetOption<bool>("IndividualProgression.AllowEarlyDungeonSet2", false);
         sIndividualProgression->earlyScourgeBosses = sConfigMgr->GetOption<bool>("IndividualProgression.AllowEarlyScourgeBosses", false);
         sIndividualProgression->tbcArenaSeason = sConfigMgr->GetOption<uint8>("IndividualProgression.TBC.ArenaSeason", 1);

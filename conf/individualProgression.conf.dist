@@ -349,6 +349,35 @@ IndividualProgression.DisableDefaultProgression = 0
 #
 IndividualProgression.CustomProgression = ""
 
+# IndividualProgression.CustomQuestProgression
+#
+#        Description: A list of quest IDs paired to progression states. When a player turns in a quest on the list,
+#                     that player is set to the paired progression state (only ever raised, never lowered), and the
+#                     world phasing for their current area is refreshed immediately.
+#
+#                     Quest turn-in is resolved per character, so this works identically solo and in a group - every
+#                     player who completes the quest advances, with none of the killing-blow / loot-distance edge
+#                     cases of creature-based progression. It is the recommended way to drive custom phase changes.
+#
+#                     The format matches IndividualProgression.CustomProgression: "questId state" pairs, comma separated.
+#                     Example: IndividualProgression.CustomQuestProgression = "40001 8, 40002 13"
+#                     This unlocks TBC (state 8) when quest 40001 is turned in, and Northrend (state 13) for quest 40002.
+#
+#                     Progression states (same scale as StartingProgression):
+#                       0  = Vanilla start          7  = Naxx40 cleared
+#                       1  = Molten Core cleared     8  = Pre-TBC (Dark Portal)
+#                       2  = Onyxia cleared          9  = TBC Tier 1 (SSC / TK)
+#                       3  = Blackwing Lair cleared  10 = TBC Tier 2 (Hyjal / BT)
+#                       4  = Pre-AQ                  12 = TBC Tier 4 (Sunwell)
+#                       5  = AQ War effort           13 = WotLK Tier 5 (Naxx / EoE / OS)
+#                       6  = AQ cleared              14+ = Ulduar and beyond
+#
+#                     Works with or without DisableDefaultProgression.
+#
+#        Default:     "" - Disabled (default)
+#
+IndividualProgression.CustomQuestProgression = ""
+
 # IndividualProgression.AllowEarlyDungeonSet2
 #
 #        Description: Dungeon Set 2 was introduced in patch 1.10 and requires completing some AQ content that is normally not available until a later phase

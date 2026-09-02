@@ -403,6 +403,7 @@ public:
     static IndividualProgression* instance();
 
     std::map<uint32, uint8> customProgressionMap;
+    std::map<uint32, uint8> customQuestProgressionMap;
     questXpMapType questXpMap;
     float vanillaPowerAdjustment, tbcPowerAdjustment, vanillaHealingAdjustment, tbcHealingAdjustment;
     bool enabled, questXpFix, enforceGroupRules, EnableSetRepCommand, EnableAllSpellRanks, LimitedSetRepCommand, fishingFix, simpleConfigOverride, MaxMonsterSight, questMoneyAtLevelCap, repeatableVanillaQuestsXp, disableDefaultProgression, earlyDungeonSet2, earlyScourgeBosses, requireNaxxStrath, doableNaxx40Bosses_4H, doableNaxx40Bosses_Gluth, doableNaxx40Bosses_Patchwerk, doableNaxx40Bosses_Razuvious, DisableQuestMarkers, DisableRDF, VanillaPvpTitlesKeepPostVanilla, VanillaPvpTitlesEarnPostVanilla, BotAccountsEarnPvPTitles, BotOnlyAdjustments;
@@ -420,6 +421,7 @@ public:
 
     void CheckAdjustments(Player* player) const;
     bool hasCustomProgressionValue(uint32 creatureEntry);
+    bool hasCustomQuestProgressionValue(uint32 questId);
     bool isExcludedAccount(Player* player);
     bool isBotAccount(Player* player);
     bool isNormalAccount(Player* player);
@@ -433,10 +435,12 @@ public:
     void UpdateRNDbotSpells(Player* player);
     void checkKillProgression(Player* player, Creature* killed);
     bool checkCustomKillProgression(Player* killer, Creature* killed);
+    void checkQuestProgression(Player* player, uint32 questId);
 	void UpdateAccountReputation(uint32 factionId, uint32 accountId, Player* player);
     void CleanUpVanillaPvpTitles(Player* player);
     void AwardEarnedVanillaPvpTitles(Player* player);
     static void LoadCustomProgressionEntries(const std::string& customProgressionString);
+    static void LoadCustomQuestProgressionEntries(const std::string& customQuestProgressionString);
     static void RemovePlayerAchievement(uint16 playerGUID, uint16 achievementId);
     static float ComputeVanillaAdjustment(uint8 playerLevel, float configAdjustmentValue);
     static uint8 GetAccountProgression(uint32 accountId);

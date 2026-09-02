@@ -848,6 +848,9 @@ public:
             }
         }
 
+        // Config-driven quest -> progression mapping (IndividualProgression.CustomQuestProgression)
+        sIndividualProgression->checkQuestProgression(player, quest->GetQuestId());
+
         switch (quest->GetQuestId())
         {
         case BANG_A_GONG:
@@ -1061,29 +1064,38 @@ public:
 
         if (killer->GetMap()->GetId() == MAP_DEADMINES)
         {
-            switch (killed->GetEntry())
+            uint32 deadminesBoss = killed->GetEntry();
+            if (deadminesBoss == RHAHK_ZOR || deadminesBoss == SNEED || deadminesBoss == GILNID)
             {
-            case RHAHK_ZOR:
-                killer->RemoveAura(IPP_PHASE);
-                killer->RemoveAura(IPP_PHASE_II);
-                killer->RemoveAura(IPP_PHASE_III);
-                killer->CastSpell(killer, IPP_PHASE, false);
-                break;
-            case SNEED:
-                killer->RemoveAura(IPP_PHASE);
-                killer->RemoveAura(IPP_PHASE_II);
-                killer->RemoveAura(IPP_PHASE_III);
-                killer->CastSpell(killer, IPP_PHASE, false);
-                killer->CastSpell(killer, IPP_PHASE_II, false);
-                break;
-            case GILNID:
-                killer->RemoveAura(IPP_PHASE);
-                killer->RemoveAura(IPP_PHASE_II);
-                killer->RemoveAura(IPP_PHASE_III);
-                killer->CastSpell(killer, IPP_PHASE, false);
-                killer->CastSpell(killer, IPP_PHASE_II, false);
-                killer->CastSpell(killer, IPP_PHASE_III, false);
-                break;
+                auto applyDeadminesPhase = [](Player* member, uint32 bossEntry)
+                {
+                    member->RemoveAura(IPP_PHASE);
+                    member->RemoveAura(IPP_PHASE_II);
+                    member->RemoveAura(IPP_PHASE_III);
+                    member->CastSpell(member, IPP_PHASE, false);
+                    if (bossEntry == SNEED || bossEntry == GILNID)
+                        member->CastSpell(member, IPP_PHASE_II, false);
+                    if (bossEntry == GILNID)
+                        member->CastSpell(member, IPP_PHASE_III, false);
+                };
+
+                // The kill hook only fires for the killing blow - fan the phase change out to the whole party
+                if (Group* deadminesGroup = killer->GetGroup())
+                {
+                    for (GroupReference* itr = deadminesGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    {
+                        Player* member = itr->GetSource();
+                        if (!member || !member->IsInWorld())
+                            continue;
+
+                        if (member->GetMap() == killer->GetMap() && member->IsAtLootRewardDistance(killed))
+                            applyDeadminesPhase(member, deadminesBoss);
+                    }
+                }
+                else
+                {
+                    applyDeadminesPhase(killer, deadminesBoss);
+                }
             }
         }
 
@@ -1141,7 +1153,8 @@ public:
                         if (!member || !sIndividualProgression->isNormalAccount(member))
                             continue;
 
-                        if (sIndividualProgression->checkCustomKillProgression(killer, killed))
+                        // Credit each eligible member, not the killing-blow player over and over
+                        if (member->IsAtLootRewardDistance(killed) && sIndividualProgression->checkCustomKillProgression(member, killed))
                             CustomCreatureKilled = true;
                     }
                 }
@@ -1194,7 +1207,8 @@ public:
                     if (!member || !sIndividualProgression->isNormalAccount(member))
                         continue;
 
-                    if (killer->IsAtLootRewardDistance(member))
+                    // IsAtLootRewardDistance() takes the reward source (the corpse) and must be called on the member
+                    if (member->IsAtLootRewardDistance(killed))
                     {
                         if (!sIndividualProgression->hasCustomProgressionValue(ENTRY_KILLED))
                             sIndividualProgression->checkKillProgression(member, killed);
