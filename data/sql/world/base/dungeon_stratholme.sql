@@ -23,8 +23,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10390, 0, 3, 0, 0, 1, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,             'Skeletal Guardian - In Combat - Cast Shadow Bolt (Phase 1)'),
 (10390, 0, 4, 0, 0, 2, 100, 0, 5000, 11000, 17000, 24500, 0, 0, 11, 8364, 1, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0,    'Skeletal Guardian - In Combat - Cast Blizzard (Phase 2)'),
 (10390, 0, 5, 0, 0, 2, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 9672, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,             'Skeletal Guardian - In Combat - Cast Frostbolt (Phase 2)'),
-(10390, 0, 6, 0, 106, 3, 100, 0, 0, 0, 13000, 24500, 0, 8, 11, 11975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Skeletal Guardian - Within 0-8 Range - Cast Arcane Explosion (Phase 3)'),
-(10390, 0, 7, 0, 0, 3, 100, 0, 0, 0, 2000, 3500, 0, 0, 11, 37361, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Skeletal Guardian - In Combat - Cast Arcane Bolt (Phase 3)'),
+-- Phase 3 is event_phase_mask 4 (1 << (phase - 1)), not 3. With mask 3 these two
+-- rows ran in phases 1 and 2, and phase 3 - one of the three phases rolled by the
+-- SMART_ACTION_RANDOM_PHASE_RANGE(1,3) on row 0 - had no events at all, so roughly
+-- a third of the Skeletal Guardians stood still without casting or meleeing.
+-- Upstream AzerothCore has mask 4 on both rows.
+(10390, 0, 6, 0, 106, 4, 100, 0, 0, 0, 13000, 24500, 0, 8, 11, 11975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Skeletal Guardian - Within 0-8 Range - Cast Arcane Explosion (Phase 3)'),
+(10390, 0, 7, 0, 0, 4, 100, 0, 0, 0, 2000, 3500, 0, 0, 11, 37361, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Skeletal Guardian - In Combat - Cast Arcane Bolt (Phase 3)'),
 (10391, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 29651, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                  'Skeletal Berserker - On Reset - Cast Dual Wield'),
 (10391, 0, 1, 0, 0, 0, 100, 0, 5100, 7900, 5900, 16500, 0, 0, 11, 11976, 0, 0, 0, 0, 0, 21, 5, 0, 0, 0, 0, 0, 0, 0,     'Skeletal Berserker - Within 0-5 Range - Cast Strike'),
 (10391, 0, 2, 0, 9, 0, 100, 0, 0, 0, 10000, 19000, 0, 5, 11, 9080, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Skeletal Berserker - Within 0-5 Range - Cast Hamstring'),

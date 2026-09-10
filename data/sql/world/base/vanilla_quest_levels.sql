@@ -460,7 +460,10 @@ UPDATE quest_template SET QuestLevel = 39, MinLevel = 33 WHERE ID=5501;
 UPDATE quest_template SET RequiredItemId1 = 18540, RequiredItemId2 = 0, RequiredItemCount1 = 1, RequiredItemCount2 = 0 WHERE ID=5526;
 
 /*  The Battle of Darrowshire  */
-UPDATE quest_template SET RequiredNpcOrGo1 = 0, RequiredNpcOrGoCount1 = 0 WHERE ID=5721;
+/*  Local fix: Classic does list "Accept Redpath's Forgiveness (1)" as an objective for
+    this quest, and without the credit the whole battle event is optional - the quest can
+    be handed in at Pamela without ever placing the Relic Bundle. Restore the AC value.  */
+UPDATE quest_template SET RequiredNpcOrGo1 = 10936, RequiredNpcOrGoCount1 = 1 WHERE ID=5721;
 
 /*  To Kill With Purpose  */
 UPDATE quest_template SET RequiredItemId1 = 15448, RequiredItemId2 = 0, RequiredItemCount1 = 1, RequiredItemCount2 = 0 WHERE ID=6022;
