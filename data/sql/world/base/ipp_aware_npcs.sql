@@ -46,6 +46,10 @@ UPDATE `gameobject_template` SET `ScriptName` = 'gobject_ipp_preaq' WHERE `entry
 UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_naxx40' WHERE `entry` IN
 (11102, 16112, 16113, 16114, 16115, 16116, 16131, 16132, 16133, 16134, 16135, 16212, 16225, 16228, 16229, 16256, 16283, 16284, 16376, 16378, 17069, 17072);
 
+-- Phasing the Argent Dawn supply caravan with the rest of Light's Hope: Guard Didier, Caravan Mule,
+-- Field Marshal Chambers. They run on SmartAI, so they get the SmartAI flavour of the same gate.
+UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_naxx40_smart' WHERE `entry` IN (16226, 16232, 16254);
+
 -- Phasing Lights Hope Chapel game objects
 UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_naxx40' WHERE `guid` IN
 (45603, 45606, 45607, 45764, 45765, 45766, 45767, 45768, 45769, 45770, 45771, 45838, 45839, 45840);

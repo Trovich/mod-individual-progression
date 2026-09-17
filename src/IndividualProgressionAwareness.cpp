@@ -1,4 +1,5 @@
 #include "IndividualProgression.h"
+#include "SmartAI.h"
 #include "WorldState.h"
 
 class gobject_ipp_preaq : public GameObjectScript
@@ -488,6 +489,37 @@ public:
     }
 };
 
+// Same gate as npc_ipp_naxx40, for Light's Hope creatures whose behaviour is SmartAI (the Argent Dawn
+// supply caravan: Guard Didier, Caravan Mule, Field Marshal Chambers). A ScriptName replaces the
+// template's AIName, so the visibility check has to sit on a SmartAI subclass to keep the scripts.
+class npc_ipp_naxx40_smart : public CreatureScript
+{
+public:
+    npc_ipp_naxx40_smart() : CreatureScript("npc_ipp_naxx40_smart") { }
+
+    struct npc_ipp_naxx40_smartAI: SmartAI
+    {
+        explicit npc_ipp_naxx40_smartAI(Creature* creature) : SmartAI(creature) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster() || !sIndividualProgression->enabled)
+                return true;
+
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+            if (sIndividualProgression->hasPassedProgression(target, PROGRESSION_AQ) || sIndividualProgression->isExcludedAccount(target))
+                return true;
+            else
+                return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_ipp_naxx40_smartAI(creature);
+    }
+};
+
 class npc_ipp_pre_tbc : public CreatureScript
 {
 public:
@@ -820,6 +852,7 @@ void AddSC_mod_individual_progression_awareness()
     new npc_ipp_si();                 // Scourge Invasion
     new npc_ipp_pre_naxx40();         // Scourge Invasion
     new npc_ipp_naxx40();
+    new npc_ipp_naxx40_smart();       // Argent Dawn supply caravan (SmartAI)
     new npc_ipp_pre_tbc();            // Vanilla pvp vendors
     new npc_ipp_tbc();
     new npc_ipp_tbc_pre_t3();         // TBC leatherworking vendors
