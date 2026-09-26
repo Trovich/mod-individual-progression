@@ -351,7 +351,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (@CGUID+4, 10408, 329, 0, 0, 1, 1, 0, 3861.04, -3561.72, 139.48, 1.89164, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
 (@CGUID+5, 10408, 329, 0, 0, 1, 1, 0, 3817.84, -3639.02, 146.269, 0.771651, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
 (@CGUID+6, 10408, 329, 0, 0, 1, 1, 0, 3972.44, -3562.87, 126.106, 3.67678, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
-(@CGUID+7, 10408, 329, 0, 0, 1, 1, 0, 4058.86, -3530.33, 122.247, 0, 86400, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
+(@CGUID+7, 10408, 329, 0, 0, 1, 1, 0, 4058.86, -3530.33, 122.247, 0, 86400, 0, 1, 8097, 0, 0, 0, 0, 0, '', 0, 0, NULL),
 --
 (@CGUID+11, 10409, 329, 0, 0, 1, 1, 0, 3858.25, -3683.23, 142.775, 3.83062, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
 (@CGUID+12, 10409, 329, 0, 0, 1, 1, 0, 3833.23, -3711.21, 142.181, 4.14354, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
@@ -359,7 +359,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (@CGUID+14, 10409, 329, 0, 0, 1, 1, 0, 3861.04, -3561.72, 139.48, 1.89164, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
 (@CGUID+15, 10409, 329, 0, 0, 1, 1, 0, 3817.84, -3639.02, 146.269, 0.771651, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
 (@CGUID+16, 10409, 329, 0, 0, 1, 1, 0, 3972.44, -3562.87, 126.106, 3.67678, 1800, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL),
-(@CGUID+17, 10409, 329, 0, 0, 1, 1, 0, 4058.86, -3530.33, 122.247, 0, 86400, 0, 1, 8097, 0, 2, 0, 0, 0, '', 0, 0, NULL);
+(@CGUID+17, 10409, 329, 0, 0, 1, 1, 0, 4058.86, -3530.33, 122.247, 0, 86400, 0, 1, 8097, 0, 0, 0, 0, 0, '', 0, 0, NULL);
 
 DELETE FROM `pool_creature` WHERE `pool_entry` BETWEEN 601021 AND 601027;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
@@ -399,7 +399,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+4,  @WPID+40, 0, 0, 0, 0, 0, NULL),
 (@CGUID+5,  @WPID+50, 0, 0, 0, 0, 0, NULL),
 (@CGUID+6,  @WPID+60, 0, 0, 0, 0, 0, NULL),
-(@CGUID+7,  @WPID+70, 0, 0, 0, 0, 0, NULL),
+(@CGUID+7,  0, 0, 0, 0, 0, 0, NULL), -- follows Stonespine
 --
 (@CGUID+11, @WPID+10, 0, 0, 0, 0, 0, NULL),
 (@CGUID+12, @WPID+20, 0, 0, 0, 0, 0, NULL),
@@ -407,7 +407,15 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+14, @WPID+40, 0, 0, 0, 0, 0, NULL),
 (@CGUID+15, @WPID+50, 0, 0, 0, 0, 0, NULL),
 (@CGUID+16, @WPID+60, 0, 0, 0, 0, 0, NULL),
-(@CGUID+17, @WPID+70, 0, 0, 0, 0, 0, NULL);
+(@CGUID+17, 0, 0, 0, 0, 0, 0, NULL); -- follows Stonespine
+
+-- Stonespine patrols with the gargoyle of pool 601027 (a Gargoyle or a Screecher). The gargoyle used to walk
+-- its own copy of his path from the same spawn point, inside his model; it follows him in formation now.
+DELETE FROM `creature_formations` WHERE `leaderGUID` = 52147 OR `memberGUID` IN (52147, @CGUID+7, @CGUID+17);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
+(52147, 52147, 0, 0, 515, 0, 0),
+(52147, @CGUID+7, 4, 180, 515, 0, 0),
+(52147, @CGUID+17, 4, 180, 515, 0, 0);
 
 DELETE FROM `waypoint_data` WHERE `id` IN (521470, @WPID+10, @WPID+20, @WPID+30, @WPID+40, @WPID+50, @WPID+60, @WPID+70);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
